@@ -1,0 +1,219 @@
+{
+  "identity": {
+    "name": "E1",
+    "mission": "Create a unique, high-quality SaaS application for education that breaks the boring LMS mold.",
+    "principles": [
+      "Fusion over Imitation: Mix Swiss precision with Organic warmth.",
+      "Emotion First: Clarity and focus for learning, excitement for discovery.",
+      "Content is King: Data and schedules must be legible but beautiful.",
+      "Zoom In: Focus on the task at hand (e.g., the next class).",
+      "Negative Space: generous breathing room."
+    ]
+  },
+  "visual_system": {
+    "theme_strategy": {
+      "mode": "light",
+      "toggle_strategy": "allow_toggle",
+      "default_mode": "light",
+      "description": "Primary 'Intellectual' Light Mode: Off-white backgrounds with sharp slate text and vibrant orange accents. Dark mode should be deep slate, not pitch black."
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "name": "Burnt Orange",
+          "hex": "#EA580C",
+          "tw_class": "bg-orange-600",
+          "usage": "Primary CTAs, Active States, Key Highlights"
+        },
+        "secondary": {
+          "name": "Deep Slate",
+          "hex": "#0F172A",
+          "tw_class": "bg-slate-900",
+          "usage": "Headings, Strong Borders, Secondary Buttons"
+        },
+        "background": {
+          "name": "Bone White",
+          "hex": "#FDFCF8",
+          "tw_class": "bg-[#FDFCF8]",
+          "usage": "Page Backgrounds (Light Mode)"
+        },
+        "surface": {
+          "name": "Pure White",
+          "hex": "#FFFFFF",
+          "tw_class": "bg-white",
+          "usage": "Cards, Modals, Dropdowns"
+        },
+        "accent_success": {
+          "name": "Growth Green",
+          "hex": "#15803D",
+          "tw_class": "bg-green-700",
+          "usage": "Success states, 'Enrolled' badges"
+        },
+        "accent_warning": {
+          "name": "Attention Yellow",
+          "hex": "#CA8A04",
+          "tw_class": "bg-yellow-600",
+          "usage": "Pending actions, Alerts"
+        },
+        "neutral": {
+          "name": "Stone Grey",
+          "hex": "#78716C",
+          "tw_class": "text-stone-500",
+          "usage": "Body text, Meta info"
+        }
+      },
+      "rules": [
+        "CRITICAL: Never use pure black (#000000). Use Deep Slate (#0F172A).",
+        "CRITICAL: Do not use Teal (#1B93A4) or Purple (#7351B7).",
+        "Gradients: Use sparingly. If used, make them subtle noise gradients, not harsh linear ones.",
+        "Contrast: Ensure text meets APCA standards. Use dark text on light backgrounds."
+      ]
+    },
+    "typography": {
+      "headings": {
+        "family": "Outfit",
+        "weights": ["500", "700"],
+        "usage": "All Headings (H1-H6). Modern, geometric, friendly.",
+        "rules": "Tight tracking (-0.02em). Do NOT use Inter or Space Grotesk."
+      },
+      "body": {
+        "family": "Manrope",
+        "weights": ["400", "500", "600"],
+        "usage": "Body text, UI labels, Data tables.",
+        "rules": "Excellent legibility for numbers and small text."
+      },
+      "scale": {
+        "h1": "text-4xl md:text-6xl font-bold tracking-tight",
+        "h2": "text-3xl md:text-4xl font-bold tracking-tight",
+        "h3": "text-2xl font-semibold tracking-tight",
+        "body_lg": "text-lg leading-relaxed",
+        "body_base": "text-base leading-relaxed",
+        "caption": "text-sm font-medium tracking-wide text-stone-500 uppercase"
+      }
+    },
+    "surfaces": {
+      "borders": "border border-stone-200 dark:border-slate-800",
+      "radius": "rounded-xl",
+      "shadows": {
+        "card": "shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300",
+        "dropdown": "shadow-xl border border-stone-100",
+        "button": "shadow-sm hover:shadow-md"
+      },
+      "glass": "bg-white/80 backdrop-blur-md border-white/20"
+    }
+  },
+  "layout_system": {
+    "spacing": {
+      "base": "p-6 md:p-8 lg:p-12",
+      "section_gap": "gap-8 md:gap-12",
+      "container": "max-w-7xl mx-auto px-4 md:px-8",
+      "rules": "Use generous padding. Cards should have p-6 or p-8 internal padding."
+    },
+    "grids": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
+      "marketing": "grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16",
+      "bento_rules": [
+        "Hero widgets span col-span-full md:col-span-8",
+        "Side widgets span col-span-full md:col-span-4",
+        "Ensure full height alignment with h-full"
+      ]
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1.5px or 2px. Clean, consistent.",
+      "installation": "yarn add lucide-react"
+    },
+    "images": {
+      "marketing_hero": {
+        "url": "https://images.unsplash.com/photo-1758685848208-e108b6af94cc",
+        "alt": "Modern teacher using technology",
+        "usage": "Landing page hero section"
+      },
+      "student_collaboration": {
+        "url": "https://images.pexels.com/photos/5212687/pexels-photo-5212687.jpeg",
+        "alt": "Students collaborating",
+        "usage": "Features section or Community highlight"
+      },
+      "remote_learning": {
+        "url": "https://images.pexels.com/photos/4261800/pexels-photo-4261800.jpeg",
+        "alt": "Child in online class",
+        "usage": "Remote learning capability section"
+      },
+      "student_dashboard_bg": {
+        "url": "https://images.unsplash.com/photo-1758611974775-39e307bc3da9",
+        "alt": "Student focusing",
+        "usage": "Subtle background or sidebar image for student view"
+      }
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-3 rounded-full shadow-sm transition-transform hover:-translate-y-0.5",
+      "secondary": "bg-white border border-stone-200 text-slate-900 hover:bg-stone-50 font-medium px-6 py-3 rounded-full transition-colors",
+      "ghost": "text-slate-600 hover:text-slate-900 hover:bg-stone-100 px-4 py-2 rounded-lg transition-colors"
+    },
+    "cards": {
+      "style": "bg-white border border-stone-100 rounded-2xl shadow-card overflow-hidden",
+      "hover": "hover:border-orange-200 transition-colors duration-300"
+    },
+    "inputs": {
+      "style": "bg-stone-50 border-transparent focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100 rounded-lg h-12 px-4 transition-all"
+    },
+    "calendar": {
+      "style": "Shadcn Calendar heavily customized. Remove default heavy borders. Use rounded selection states. Active day: bg-orange-600 text-white."
+    },
+    "toasts": {
+      "library": "sonner",
+      "position": "bottom-right",
+      "style": "Clean white toast with slate text."
+    }
+  },
+  "pages": {
+    "landing": {
+      "sections": [
+        "Hero: Asymmetrical grid. Text left, large image right with floating 'Live Class' badge.",
+        "Features: Bento grid showing 'Schedule', 'Video Library', 'Live Meet'.",
+        "Social Proof: 'Trusted by' logos (use placeholders or generic text if logos missing).",
+        "CTA: Large banner with Burnt Orange background."
+      ],
+      "motion": "Scroll-triggered fade-ins using framer-motion."
+    },
+    "dashboard": {
+      "layout": "Sidebar navigation (left). Main content area (right).",
+      "widgets": [
+        "Upcoming Class (Hero Card)",
+        "Schedule Overview (Calendar Widget)",
+        "Quick Actions (Join Meet, Upload Video)",
+        "Recent Recordings (List)"
+      ]
+    },
+    "scheduling": {
+      "layout": "Split view. Left: Calendar/Date Picker. Right: Available Slots (Slot Picker style).",
+      "interaction": "Click date -> Slots appear -> Click slot -> Confirm."
+    },
+    "video_library": {
+      "layout": "Grid of video thumbnails with 'Play' overlay.",
+      "filters": "Filter by Class, Date, Teacher."
+    }
+  },
+  "universal_guidelines": [
+    "You tend to converge toward generic outputs. Avoid this.",
+    "Dark colors look good when used independently without gradients.",
+    "Don't make generic centered layouts.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters.",
+    "You MUST NOT apply universal transition (transition: all).",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles (pill-shaped).",
+    "NEVER use AI assistant Emoji characters.",
+    "Every interaction needs micro-animations.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Prioritize using pre-existing components from src/components/ui.",
+    "Components MUST use named exports.",
+    "Use sonner for toasts.",
+    "All interactive elements MUST include data-testid attribute."
+  ],
+  "instructions_to_main_agent": "Read this JSON. Install 'lucide-react' and 'framer-motion' if missing. Use the defined color palette in tailwind.config.js. Build the 'Intellectual' theme. Focus on the 'Bento' grid for the dashboard and 'Slot Picker' for scheduling. Use the provided image URLs."
+}

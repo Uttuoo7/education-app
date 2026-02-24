@@ -1,0 +1,138 @@
+.App {
+  min-height: 100vh;
+}
+
+.hero-section {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+}
+
+.feature-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+}
+
+.class-card {
+  transition: all 0.3s ease;
+}
+
+.class-card:hover {
+  border-color: #EA580C;
+}
+
+.video-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-card:hover .video-overlay {
+  opacity: 1;
+}
+
+.dashboard-widget {
+  height: 100%;
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, transparent 100%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.btn-primary {
+  background: #EA580C;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #C2410C;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #E7E5E4;
+  color: #0F172A;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #F5F5F4;
+}
+
+.sidebar {
+  border-right: 1px solid #E7E5E4;
+  background: white;
+}
+
+.sidebar-link {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  color: #78716C;
+}
+
+.sidebar-link:hover {
+  background: #F5F5F4;
+  color: #0F172A;
+}
+
+.sidebar-link.active {
+  background: #FFF7ED;
+  color: #EA580C;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
