@@ -10,12 +10,12 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
 from fastapi import Response
-from backend.database import client
-from backend.database import db
-from backend.google_oauth import router as google_router
+from  database import client
+from  database import db
+from  google_oauth import router as google_router
 import uuid
-from backend.routes import schedule
-from backend.auth import (
+from  routes import schedule
+from  auth import (
     verify_password,
     hash_password,
     create_access_token,

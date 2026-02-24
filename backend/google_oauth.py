@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from googleapiclient.discovery import build
-from backend.auth import get_current_user
-from backend.database import db
+from  auth import get_current_user
+from  database import db
 import uuid
 from fastapi.responses import RedirectResponse
 from google_auth_oauthlib.flow import Flow
