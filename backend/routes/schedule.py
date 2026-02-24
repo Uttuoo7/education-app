@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime
 from uuid import uuid4
-from backend.models.schedule import ScheduleCreate
-from backend.database import db
-from backend.auth import get_current_user
+from models.schedule import ScheduleCreate
+from database import db
+from auth import get_current_user
 
 router = APIRouter(prefix="/api/schedule", tags=["Schedule"])
 

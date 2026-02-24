@@ -1,0 +1,36 @@
+services:
+  # Backend - FastAPI
+  - type: web
+    name: education-app-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        # Set this to: https://<your-backend-name>.onrender.com/api/google/callback
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+
+  # Frontend - React (CRA + Craco)
+  - type: web
+    name: education-app-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        # Set this to: https://<your-backend-name>.onrender.com
+        sync: false

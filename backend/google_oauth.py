@@ -26,7 +26,7 @@ def exchange_code_for_credentials(code: str):
             "token_uri": "https://oauth2.googleapis.com/token",
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
-            "redirect_uris": ["http://localhost:8000/api/google/callback"],
+            "redirect_uris": [os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/google/callback")],
         }
     }
 
@@ -38,7 +38,7 @@ def exchange_code_for_credentials(code: str):
             "https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/calendar",
         ],
-        redirect_uri="http://localhost:8000/api/google/callback",
+        redirect_uri=os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/google/callback"),
     )
 
     flow.fetch_token(code=code)
@@ -58,7 +58,7 @@ async def google_login(user = Depends(get_current_user)):
             "token_uri": "https://oauth2.googleapis.com/token",
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
-            "redirect_uris": ["http://localhost:8000/api/google/callback"],
+            "redirect_uris": [os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/google/callback")],
         }
     }
 
@@ -70,7 +70,7 @@ async def google_login(user = Depends(get_current_user)):
             "https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/calendar",
         ],
-        redirect_uri="http://localhost:8000/api/google/callback",
+        redirect_uri=os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/google/callback"),
     )
 
     authorization_url, state = flow.authorization_url(

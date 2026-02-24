@@ -161,12 +161,13 @@ async def login_user(
 
     access_token = create_access_token({"sub": user["user_id"]})
 
+    is_production = os.getenv("ENVIRONMENT", "development") == "production"
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,   # change to True when deployed
-        samesite="lax"
+        secure=is_production,
+        samesite="none" if is_production else "lax"
     )
 
     return {

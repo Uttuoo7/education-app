@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from backend.database import db
+from database import db
 
 SECRET_KEY = os.getenv("SECRET_KEY",  "dev-temporary-secret")
 ALGORITHM = "HS256"
