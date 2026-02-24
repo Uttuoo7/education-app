@@ -1,8 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600&display=swap');
 
+/* Font utility classes — use these instead of repeating inline style strings */
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+.font-manrope {
+  font-family: 'Manrope', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 body {
   margin: 0;
@@ -38,6 +48,7 @@ code {
     --ring: 17 88% 48%;
     --radius: 0.75rem;
   }
+
   .dark {
     --background: 222 47% 11%;
     --foreground: 60 9% 98%;
@@ -65,6 +76,7 @@ code {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -75,7 +87,7 @@ code {
     display: contents !important;
   }
 
-  [data-debug-wrapper="true"] > * {
+  [data-debug-wrapper="true"]>* {
     margin-left: inherit;
     margin-right: inherit;
     margin-top: inherit;

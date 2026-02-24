@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useNavigate } from "react-router-dom";
-import { Calendar, Video, Users, Clock, GraduationCap, Zap } from 'lucide-react';
+import { Calendar, Video, Users, Clock, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
@@ -8,6 +8,12 @@ import { useEffect } from 'react';
 const LandingPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
+
+  // If the user prefers reduced motion, skip animations entirely
+  const fadeUp = shouldReduceMotion ? {} : { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } };
+  const fadeLeft = shouldReduceMotion ? {} : { initial: { opacity: 0, x: -50 }, animate: { opacity: 1, x: 0 }, transition: { duration: 0.6 } };
+  const fadeRight = shouldReduceMotion ? {} : { initial: { opacity: 0, x: 50 }, animate: { opacity: 1, x: 0 }, transition: { duration: 0.6, delay: 0.2 } };
 
   useEffect(() => {
     if (!loading && user) {
@@ -15,9 +21,9 @@ const LandingPage = () => {
     }
   }, [user, loading, navigate]);
 
-const handleLogin = () => {
-  navigate('/login');
-};
+  const handleLogin = () => {
+    navigate('/login');
+  };
 
   if (loading) {
     return (
@@ -36,7 +42,7 @@ const handleLogin = () => {
               <GraduationCap className="w-8 h-8 text-orange-600" strokeWidth={2} />
               <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>ClassHub</span>
             </div>
-            <Button 
+            <Button
               onClick={handleLogin}
               data-testid="nav-login-btn"
               className="bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-3 rounded-full shadow-sm transition-transform hover:-translate-y-0.5"
@@ -50,28 +56,26 @@ const handleLogin = () => {
       <section className="hero-section py-20">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16 items-center">
-            <motion.div 
+            <motion.div
               className="col-span-full md:col-span-6"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              {...fadeLeft}
             >
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-6 font-outfit">
                 Your Virtual Classroom,
                 <span className="text-orange-600"> Simplified</span>
               </h1>
-              <p className="text-lg leading-relaxed text-stone-500 mb-8" style={{ fontFamily: 'Manrope, sans-serif' }}>
+              <p className="text-lg leading-relaxed text-stone-500 mb-8 font-manrope">
                 Schedule classes, host live sessions with Google Meet, and manage your learning community all in one place.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button 
+                <Button
                   onClick={handleLogin}
                   data-testid="hero-get-started-btn"
                   className="bg-orange-600 hover:bg-orange-700 text-white font-medium px-8 py-4 rounded-full shadow-sm transition-transform hover:-translate-y-0.5 text-lg"
                 >
                   Get Started Free
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   className="bg-white border border-stone-200 text-slate-900 hover:bg-stone-50 font-medium px-8 py-4 rounded-full transition-colors text-lg"
                 >
@@ -80,17 +84,20 @@ const handleLogin = () => {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="col-span-full md:col-span-6"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              {...fadeRight}
             >
               <div className="relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1758685848208-e108b6af94cc" 
-                  alt="Modern teacher using technology" 
-                  className="rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] w-full"
+                {/* Unsplash params: w=900&q=75&auto=format serve a compressed WebP ~80KB vs original ~2MB */}
+                <img
+                  src="https://images.unsplash.com/photo-1758685848208-e108b6af94cc?w=900&q=75&auto=format&fit=crop"
+                  alt="Modern teacher using technology in a classroom"
+                  width={900}
+                  height={600}
+                  fetchpriority="high"
+                  decoding="async"
+                  className="rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] w-full h-auto"
                 />
                 <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 shadow-xl">
                   <div className="flex items-center gap-2">
@@ -116,7 +123,7 @@ const handleLogin = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <motion.div 
+            <motion.div
               className="col-span-full md:col-span-8 bg-white border border-stone-100 rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 feature-card"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -136,7 +143,7 @@ const handleLogin = () => {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="col-span-full md:col-span-4 bg-white border border-stone-100 rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 feature-card"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -152,7 +159,7 @@ const handleLogin = () => {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="col-span-full md:col-span-4 bg-white border border-stone-100 rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 feature-card"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -168,7 +175,7 @@ const handleLogin = () => {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="col-span-full md:col-span-8 bg-white border border-stone-100 rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 feature-card"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -205,7 +212,7 @@ const handleLogin = () => {
             <p className="text-lg text-orange-100 mb-8" style={{ fontFamily: 'Manrope, sans-serif' }}>
               Join educators worldwide who are creating engaging online learning experiences
             </p>
-            <Button 
+            <Button
               onClick={handleLogin}
               data-testid="cta-get-started-btn"
               className="bg-white hover:bg-orange-50 text-orange-600 font-medium px-8 py-4 rounded-full shadow-sm transition-transform hover:-translate-y-0.5 text-lg"
