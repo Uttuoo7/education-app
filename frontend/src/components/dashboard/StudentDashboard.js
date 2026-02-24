@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config';
 
 const StudentDashboard = ({ activeTab, user }) => {
   const [classes, setClasses] = useState([]);
@@ -20,9 +20,9 @@ const StudentDashboard = ({ activeTab, user }) => {
     try {
       setLoading(true);
       const [classesRes, enrollmentsRes, videosRes] = await Promise.all([
-        fetch(`${BACKEND_URL}/api/classes`, { credentials: 'include' }),
-        fetch(`${BACKEND_URL}/api/enrollments`, { credentials: 'include' }),
-        fetch(`${BACKEND_URL}/api/videos`, { credentials: 'include' })
+        fetch(`${API_BASE}/classes`, { credentials: 'include' }),
+        fetch(`${API_BASE}/enrollments`, { credentials: 'include' }),
+        fetch(`${API_BASE}/videos`, { credentials: 'include' })
       ]);
 
       if (classesRes.ok && enrollmentsRes.ok && videosRes.ok) {
@@ -44,7 +44,7 @@ const StudentDashboard = ({ activeTab, user }) => {
 
   const handleEnroll = async (classId) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/enrollments`, {
+      const response = await fetch(`${API_BASE}/enrollments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

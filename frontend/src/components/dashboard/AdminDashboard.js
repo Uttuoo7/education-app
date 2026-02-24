@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config';
 
 const AdminDashboard = ({ activeTab, user }) => {
   const [users, setUsers] = useState([]);
@@ -20,9 +20,9 @@ const AdminDashboard = ({ activeTab, user }) => {
     try {
       setLoading(true);
       const [usersRes, classesRes, videosRes] = await Promise.all([
-        fetch(`${BACKEND_URL}/api/users`, { credentials: 'include' }),
-        fetch(`${BACKEND_URL}/api/classes`, { credentials: 'include' }),
-        fetch(`${BACKEND_URL}/api/videos`, { credentials: 'include' })
+        fetch(`${API_BASE}/users`, { credentials: 'include' }),
+        fetch(`${API_BASE}/classes`, { credentials: 'include' }),
+        fetch(`${API_BASE}/videos`, { credentials: 'include' })
       ]);
 
       if (usersRes.ok && classesRes.ok && videosRes.ok) {
@@ -39,7 +39,7 @@ const AdminDashboard = ({ activeTab, user }) => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/users/${userId}`, {
+      const response = await fetch(`${API_BASE}/users/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -217,11 +217,10 @@ const AdminDashboard = ({ activeTab, user }) => {
                     </td>
                     <td className="px-6 py-4 text-sm text-stone-600" style={{ fontFamily: 'Manrope, sans-serif' }}>{u.email}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                        u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                        u.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
-                        'bg-green-100 text-green-700'
-                      }`}>
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                          u.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
+                            'bg-green-100 text-green-700'
+                        }`}>
                         {u.role}
                       </span>
                     </td>

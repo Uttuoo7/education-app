@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { 
-  GraduationCap, 
-  Calendar, 
-  Video, 
-  Users, 
-  LogOut, 
+import {
+  GraduationCap,
+  Calendar,
+  Video,
+  Users,
+  LogOut,
   Plus,
   Clock,
   BookOpen,
@@ -17,7 +17,7 @@ import StudentDashboard from '@/components/dashboard/StudentDashboard';
 import TeacherDashboard from '@/components/dashboard/TeacherDashboard';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 
 const Dashboard = () => {
   const { user, loading, logout } = useAuth();
@@ -48,20 +48,20 @@ const Dashboard = () => {
     admin: 'Administrator'
   };
 
-  const menuItems = user.role === 'admin' 
+  const menuItems = user.role === 'admin'
     ? [
-        { id: 'overview', label: 'Overview', icon: BarChart3 },
-        { id: 'users', label: 'Users', icon: Users },
-        { id: 'classes', label: 'Classes', icon: BookOpen },
-        { id: 'videos', label: 'Videos', icon: Video },
-      ]
+      { id: 'overview', label: 'Overview', icon: BarChart3 },
+      { id: 'users', label: 'Users', icon: Users },
+      { id: 'classes', label: 'Classes', icon: BookOpen },
+      { id: 'videos', label: 'Videos', icon: Video },
+    ]
     : user.role === 'teacher'
-    ? [
+      ? [
         { id: 'overview', label: 'Overview', icon: BarChart3 },
         { id: 'classes', label: 'My Classes', icon: BookOpen },
         { id: 'videos', label: 'Video Library', icon: Video },
       ]
-    : [
+      : [
         { id: 'overview', label: 'Overview', icon: BarChart3 },
         { id: 'classes', label: 'My Classes', icon: BookOpen },
         { id: 'videos', label: 'Videos', icon: Video },
@@ -78,8 +78,8 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <img 
-                  src={user.picture || 'https://via.placeholder.com/40'} 
+                <img
+                  src={user.picture || 'https://via.placeholder.com/40'}
                   alt={user.name}
                   className="w-10 h-10 rounded-full border-2 border-orange-100"
                 />
@@ -111,11 +111,10 @@ const Dashboard = () => {
                   key={item.id}
                   data-testid={`nav-${item.id}`}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    activeTab === item.id
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === item.id
                       ? 'bg-orange-50 text-orange-600 font-medium'
                       : 'text-stone-500 hover:bg-stone-50 hover:text-slate-900'
-                  }`}
+                    }`}
                   style={{ fontFamily: 'Manrope, sans-serif' }}
                 >
                   <Icon className="w-5 h-5" strokeWidth={2} />

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config';
 
 const TeacherDashboard = ({ activeTab, user }) => {
   const [classes, setClasses] = useState([]);
@@ -40,8 +40,8 @@ const TeacherDashboard = ({ activeTab, user }) => {
     try {
       setLoading(true);
       const [classesRes, videosRes] = await Promise.all([
-        fetch(`${BACKEND_URL}/api/classes`, { credentials: 'include' }),
-        fetch(`${BACKEND_URL}/api/videos`, { credentials: 'include' })
+        fetch(`${API_BASE}/classes`, { credentials: 'include' }),
+        fetch(`${API_BASE}/videos`, { credentials: 'include' })
       ]);
 
       if (classesRes.ok && videosRes.ok) {
@@ -58,7 +58,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
   const handleCreateClass = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BACKEND_URL}/api/classes`, {
+      const response = await fetch(`${API_BASE}/classes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -80,7 +80,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
 
   const handleCreateMeetLink = async (classId) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/classes/${classId}/meet`, {
+      const response = await fetch(`${API_BASE}/classes/${classId}/meet`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -101,7 +101,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
     if (!window.confirm('Are you sure you want to delete this class?')) return;
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/classes/${classId}`, {
+      const response = await fetch(`${API_BASE}/classes/${classId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -120,7 +120,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
   const handleCreateVideo = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BACKEND_URL}/api/videos`, {
+      const response = await fetch(`${API_BASE}/videos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -231,7 +231,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                     <Input
                       data-testid="class-title-input"
                       value={newClass.title}
-                      onChange={(e) => setNewClass({...newClass, title: e.target.value})}
+                      onChange={(e) => setNewClass({ ...newClass, title: e.target.value })}
                       required
                     />
                   </div>
@@ -240,7 +240,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                     <Textarea
                       data-testid="class-description-input"
                       value={newClass.description}
-                      onChange={(e) => setNewClass({...newClass, description: e.target.value})}
+                      onChange={(e) => setNewClass({ ...newClass, description: e.target.value })}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -250,7 +250,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                         data-testid="class-start-time-input"
                         type="datetime-local"
                         value={newClass.start_time}
-                        onChange={(e) => setNewClass({...newClass, start_time: e.target.value})}
+                        onChange={(e) => setNewClass({ ...newClass, start_time: e.target.value })}
                         required
                       />
                     </div>
@@ -260,7 +260,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                         data-testid="class-end-time-input"
                         type="datetime-local"
                         value={newClass.end_time}
-                        onChange={(e) => setNewClass({...newClass, end_time: e.target.value})}
+                        onChange={(e) => setNewClass({ ...newClass, end_time: e.target.value })}
                         required
                       />
                     </div>
@@ -271,7 +271,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                       data-testid="class-max-students-input"
                       type="number"
                       value={newClass.max_students}
-                      onChange={(e) => setNewClass({...newClass, max_students: parseInt(e.target.value)})}
+                      onChange={(e) => setNewClass({ ...newClass, max_students: parseInt(e.target.value) })}
                       min="1"
                       required
                     />
@@ -363,7 +363,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                   <Label>Title</Label>
                   <Input
                     value={newClass.title}
-                    onChange={(e) => setNewClass({...newClass, title: e.target.value})}
+                    onChange={(e) => setNewClass({ ...newClass, title: e.target.value })}
                     required
                   />
                 </div>
@@ -371,7 +371,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                   <Label>Description</Label>
                   <Textarea
                     value={newClass.description}
-                    onChange={(e) => setNewClass({...newClass, description: e.target.value})}
+                    onChange={(e) => setNewClass({ ...newClass, description: e.target.value })}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -380,7 +380,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                     <Input
                       type="datetime-local"
                       value={newClass.start_time}
-                      onChange={(e) => setNewClass({...newClass, start_time: e.target.value})}
+                      onChange={(e) => setNewClass({ ...newClass, start_time: e.target.value })}
                       required
                     />
                   </div>
@@ -389,7 +389,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                     <Input
                       type="datetime-local"
                       value={newClass.end_time}
-                      onChange={(e) => setNewClass({...newClass, end_time: e.target.value})}
+                      onChange={(e) => setNewClass({ ...newClass, end_time: e.target.value })}
                       required
                     />
                   </div>
@@ -399,7 +399,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                   <Input
                     type="number"
                     value={newClass.max_students}
-                    onChange={(e) => setNewClass({...newClass, max_students: parseInt(e.target.value)})}
+                    onChange={(e) => setNewClass({ ...newClass, max_students: parseInt(e.target.value) })}
                     min="1"
                     required
                   />
@@ -502,7 +502,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                     data-testid="video-class-select"
                     className="w-full px-4 py-2 border border-stone-200 rounded-lg"
                     value={newVideo.class_id}
-                    onChange={(e) => setNewVideo({...newVideo, class_id: e.target.value})}
+                    onChange={(e) => setNewVideo({ ...newVideo, class_id: e.target.value })}
                     required
                   >
                     <option value="">Select a class</option>
@@ -516,7 +516,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                   <Input
                     data-testid="video-title-input"
                     value={newVideo.title}
-                    onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
+                    onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
                     required
                   />
                 </div>
@@ -526,7 +526,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                     data-testid="video-url-input"
                     type="url"
                     value={newVideo.video_url}
-                    onChange={(e) => setNewVideo({...newVideo, video_url: e.target.value})}
+                    onChange={(e) => setNewVideo({ ...newVideo, video_url: e.target.value })}
                     placeholder="https://..."
                   />
                 </div>
@@ -535,7 +535,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
                   <Textarea
                     data-testid="video-description-input"
                     value={newVideo.description}
-                    onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
+                    onChange={(e) => setNewVideo({ ...newVideo, description: e.target.value })}
                   />
                 </div>
                 <Button type="submit" data-testid="submit-video-btn" className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-full">
