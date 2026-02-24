@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 
 from backend.database import db
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY",  "dev-temporary-secret")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
