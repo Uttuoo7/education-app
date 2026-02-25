@@ -217,7 +217,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
 
   const formatDateTime = (dateStr) => new Date(dateStr).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
 
-  const ClassSelector = ({ label = 'Select Class' }) => (
+  const renderClassSelector = (label = 'Select Class') => (
     <select
       className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
       value={selectedClass}
@@ -228,7 +228,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
     </select>
   );
 
-  const CreateClassForm = () => (
+  const renderCreateClassDialog = () => (
     <Dialog open={showClassDialog} onOpenChange={setShowClassDialog}>
       <DialogTrigger asChild>
         <Button className="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-full">
@@ -270,7 +270,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
             <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>Class Calendar</h1>
             <p className="text-stone-500 mt-1" style={{ fontFamily: 'Manrope, sans-serif' }}>All your scheduled classes at a glance</p>
           </div>
-          <CreateClassForm />
+          {renderCreateClassDialog()}
         </div>
         <Card className="bg-white border border-stone-100 rounded-2xl p-4 shadow-card" style={{ height: 600 }}>
           <Calendar
@@ -385,7 +385,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div><h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>My Classes</h1><p className="text-stone-500">Manage your classes</p></div>
-          <CreateClassForm />
+          {renderCreateClassDialog()}
         </div>
         {classes.length === 0 ? <Card className="p-8 text-center"><p className="text-stone-500">No classes yet</p></Card> : (
           <div className="space-y-4">
@@ -425,7 +425,7 @@ const TeacherDashboard = ({ activeTab, user }) => {
         <Card className="bg-white border border-stone-100 rounded-2xl p-6 shadow-card">
           <h2 className="text-lg font-semibold mb-4">Post New Assignment</h2>
           <form onSubmit={handlePostAssignment} className="space-y-4">
-            <ClassSelector />
+            {renderClassSelector()}
             <div><Label>Title</Label><Input value={newAssignment.title} onChange={e => setNewAssignment({ ...newAssignment, title: e.target.value })} required /></div>
             <div><Label>Description</Label><Textarea value={newAssignment.description} onChange={e => setNewAssignment({ ...newAssignment, description: e.target.value })} /></div>
             <div><Label>Due Date</Label><Input type="datetime-local" value={newAssignment.due_date} onChange={e => setNewAssignment({ ...newAssignment, due_date: e.target.value })} required /></div>
