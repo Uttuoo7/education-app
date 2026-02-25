@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const AuthContext = createContext(null);
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000/api';
+const _base = process.env.REACT_APP_API_BASE || 'http://localhost:8000';
+const API_BASE = _base.endsWith('/api') ? _base : `${_base}/api`;
 
 
 export const AuthProvider = ({ children }) => {
