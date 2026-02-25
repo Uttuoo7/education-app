@@ -176,6 +176,18 @@ async def login_user(
 }
 
 
+@api_router.get("/auth/me", response_model=User)
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Return the currently authenticated user (used by AuthContext on every page load)."""
+    return User(**{k: v for k, v in current_user.items() if k != "password"})
+
+
+@api_router.post("/auth/logout")
+async def logout_user(response: Response):
+    """Clear the auth cookie."""
+    response.delete_cookie(key="access_token", httponly=True, samesite="lax")
+    return {"message": "Logged out successfully"}
+
 
 @api_router.post("/classes", response_model=ClassResponse)
 async def create_class(class_data: ClassCreate, user: dict = Depends(get_current_user)):
