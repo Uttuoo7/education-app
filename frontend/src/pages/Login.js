@@ -41,9 +41,12 @@ const Login = () => {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-2xl shadow-md w-96"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Login to ClassHub
-        </h2>
+        <div className="text-center mb-6">
+          <img src="/logo.png" alt="StarZEdu Classes" className="h-16 w-auto mx-auto mb-3" />
+          <h2 className="text-2xl font-bold text-slate-900">
+            Login to StarZEdu Classes
+          </h2>
+        </div>
 
         <input
           type="email"

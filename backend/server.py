@@ -404,6 +404,328 @@ async def delete_class(class_id: str, user: dict = Depends(get_current_user)):
     return {"message": "Class deleted successfully"}
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ANNOUNCEMENTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+class AnnouncementCreate(BaseModel):
+    title: str
+    content: str
+
+@api_router.post("/classes/{class_id}/announcements")
+async def create_announcement(class_id: str, data: AnnouncementCreate, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can post announcements")
+    doc = {
+        "announcement_id": f"ann_{uuid.uuid4().hex[:12]}",
+        "class_id": class_id,
+        "title": data.title,
+        "content": data.content,
+        "posted_by": user.get("user_id"),
+        "posted_by_name": user.get("name"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    await db.announcements.insert_one(doc)
+    return {"message": "Announcement posted", "announcement_id": doc["announcement_id"]}
+
+@api_router.get("/classes/{class_id}/announcements")
+async def get_announcements(class_id: str, user: dict = Depends(get_current_user)):
+    items = await db.announcements.find({"class_id": class_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return items
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HOMEWORK / ASSIGNMENTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+class AssignmentCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    due_date: str  # ISO string
+
+@api_router.post("/classes/{class_id}/assignments")
+async def create_assignment(class_id: str, data: AssignmentCreate, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can post assignments")
+    doc = {
+        "assignment_id": f"asn_{uuid.uuid4().hex[:12]}",
+        "class_id": class_id,
+        "title": data.title,
+        "description": data.description,
+        "due_date": data.due_date,
+        "created_by": user.get("user_id"),
+        "created_by_name": user.get("name"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    await db.assignments.insert_one(doc)
+    return {"message": "Assignment created", "assignment_id": doc["assignment_id"]}
+
+@api_router.get("/classes/{class_id}/assignments")
+async def get_assignments(class_id: str, user: dict = Depends(get_current_user)):
+    items = await db.assignments.find({"class_id": class_id}, {"_id": 0}).sort("due_date", 1).to_list(100)
+    return items
+
+@api_router.get("/assignments")
+async def get_all_assignments(user: dict = Depends(get_current_user)):
+    """Return all assignments across all classes the user is enrolled in (students) or teaches (teacher)."""
+    if user.get("role") == "student":
+        enrollments = await db.enrollments.find({"user_id": user.get("user_id")}, {"_id": 0}).to_list(1000)
+        class_ids = [e["class_id"] for e in enrollments]
+        items = await db.assignments.find({"class_id": {"$in": class_ids}}, {"_id": 0}).sort("due_date", 1).to_list(500)
+    elif user.get("role") == "teacher":
+        classes = await db.classes.find({"teacher_id": user.get("user_id")}, {"_id": 0}).to_list(1000)
+        class_ids = [c["class_id"] for c in classes]
+        items = await db.assignments.find({"class_id": {"$in": class_ids}}, {"_id": 0}).sort("due_date", 1).to_list(500)
+    else:
+        items = await db.assignments.find({}, {"_id": 0}).sort("due_date", 1).to_list(500)
+    return items
+
+@api_router.delete("/classes/{class_id}/assignments/{assignment_id}")
+async def delete_assignment(class_id: str, assignment_id: str, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can delete assignments")
+    await db.assignments.delete_one({"assignment_id": assignment_id, "class_id": class_id})
+    return {"message": "Assignment deleted"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LESSON NOTES
+# ─────────────────────────────────────────────────────────────────────────────
+
+class NoteCreate(BaseModel):
+    content: str
+    session_date: str  # ISO date string
+
+@api_router.post("/classes/{class_id}/notes")
+async def create_note(class_id: str, data: NoteCreate, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can add notes")
+    doc = {
+        "note_id": f"note_{uuid.uuid4().hex[:12]}",
+        "class_id": class_id,
+        "content": data.content,
+        "session_date": data.session_date,
+        "created_by": user.get("user_id"),
+        "created_by_name": user.get("name"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    await db.notes.insert_one(doc)
+    return {"message": "Note saved", "note_id": doc["note_id"]}
+
+@api_router.get("/classes/{class_id}/notes")
+async def get_notes(class_id: str, user: dict = Depends(get_current_user)):
+    items = await db.notes.find({"class_id": class_id}, {"_id": 0}).sort("session_date", -1).to_list(200)
+    return items
+
+@api_router.delete("/classes/{class_id}/notes/{note_id}")
+async def delete_note(class_id: str, note_id: str, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can delete notes")
+    await db.notes.delete_one({"note_id": note_id, "class_id": class_id})
+    return {"message": "Note deleted"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ATTENDANCE
+# ─────────────────────────────────────────────────────────────────────────────
+
+class AttendanceRecord(BaseModel):
+    student_id: str
+    status: str  # "present" | "absent" | "late"
+
+class AttendanceCreate(BaseModel):
+    session_date: str  # ISO date
+    records: List[AttendanceRecord]
+
+@api_router.post("/classes/{class_id}/attendance")
+async def save_attendance(class_id: str, data: AttendanceCreate, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can record attendance")
+    doc = {
+        "attendance_id": f"att_{uuid.uuid4().hex[:12]}",
+        "class_id": class_id,
+        "session_date": data.session_date,
+        "records": [r.model_dump() for r in data.records],
+        "marked_by": user.get("user_id"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    # Upsert by class_id + session_date so re-submitting a date overwrites
+    await db.attendance.replace_one(
+        {"class_id": class_id, "session_date": data.session_date},
+        doc,
+        upsert=True
+    )
+    return {"message": "Attendance saved"}
+
+@api_router.get("/classes/{class_id}/attendance")
+async def get_attendance(class_id: str, user: dict = Depends(get_current_user)):
+    items = await db.attendance.find({"class_id": class_id}, {"_id": 0}).sort("session_date", -1).to_list(200)
+    return items
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROGRESS / GRADES
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ProgressCreate(BaseModel):
+    student_id: str
+    grade: Optional[str] = None   # e.g. "A", "85%", "Pass"
+    comment: Optional[str] = None
+
+@api_router.post("/classes/{class_id}/progress")
+async def add_progress(class_id: str, data: ProgressCreate, user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["teacher", "admin"]:
+        raise HTTPException(status_code=403, detail="Only teachers/admins can add progress")
+    doc = {
+        "progress_id": f"prog_{uuid.uuid4().hex[:12]}",
+        "class_id": class_id,
+        "student_id": data.student_id,
+        "grade": data.grade,
+        "comment": data.comment,
+        "added_by": user.get("user_id"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    # Upsert: one progress record per student per class
+    await db.progress.replace_one(
+        {"class_id": class_id, "student_id": data.student_id},
+        doc,
+        upsert=True
+    )
+    return {"message": "Progress updated"}
+
+@api_router.get("/classes/{class_id}/progress")
+async def get_progress(class_id: str, user: dict = Depends(get_current_user)):
+    if user.get("role") == "student":
+        items = await db.progress.find(
+            {"class_id": class_id, "student_id": user.get("user_id")}, {"_id": 0}
+        ).to_list(10)
+    else:
+        items = await db.progress.find({"class_id": class_id}, {"_id": 0}).to_list(100)
+    return items
+
+@api_router.get("/progress")
+async def get_my_progress(user: dict = Depends(get_current_user)):
+    """All progress records for the current student."""
+    if user.get("role") != "student":
+        raise HTTPException(status_code=403, detail="Students only")
+    items = await db.progress.find({"student_id": user.get("user_id")}, {"_id": 0}).to_list(100)
+    return items
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STUDENT CREDITS
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CreditAdjust(BaseModel):
+    amount: float          # positive = add, negative = deduct
+    note: Optional[str] = None
+
+@api_router.post("/students/{student_id}/credits")
+async def adjust_credits(student_id: str, data: CreditAdjust, user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    transaction = {
+        "tx_id": f"tx_{uuid.uuid4().hex[:12]}",
+        "student_id": student_id,
+        "amount": data.amount,
+        "note": data.note,
+        "created_by": user.get("user_id"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    await db.credit_transactions.insert_one(transaction)
+    # Update balance on user document
+    await db.users.update_one(
+        {"user_id": student_id},
+        {"$inc": {"credit_balance": data.amount}}
+    )
+    return {"message": "Credits adjusted"}
+
+@api_router.get("/students/{student_id}/credits")
+async def get_credits(student_id: str, user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin" and user.get("user_id") != student_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    student = await db.users.find_one({"user_id": student_id}, {"_id": 0})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    transactions = await db.credit_transactions.find(
+        {"student_id": student_id}, {"_id": 0}
+    ).sort("created_at", -1).to_list(200)
+    return {"balance": student.get("credit_balance", 0), "transactions": transactions}
+
+@api_router.get("/credits")
+async def get_all_credits(user: dict = Depends(get_current_user)):
+    """Admin: get credit balance for all students."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    students = await db.users.find({"role": "student"}, {"_id": 0}).to_list(1000)
+    return [
+        {"user_id": s["user_id"], "name": s.get("name"), "email": s.get("email"),
+         "credit_balance": s.get("credit_balance", 0)}
+        for s in students
+    ]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INVOICES
+# ─────────────────────────────────────────────────────────────────────────────
+
+class InvoiceCreate(BaseModel):
+    student_id: str
+    amount: float
+    description: str
+    due_date: str   # ISO date string
+
+@api_router.post("/invoices")
+async def create_invoice(data: InvoiceCreate, user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    student = await db.users.find_one({"user_id": data.student_id}, {"_id": 0})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    doc = {
+        "invoice_id": f"inv_{uuid.uuid4().hex[:12]}",
+        "student_id": data.student_id,
+        "student_name": student.get("name"),
+        "student_email": student.get("email"),
+        "amount": data.amount,
+        "description": data.description,
+        "due_date": data.due_date,
+        "status": "unpaid",     # "unpaid" | "paid"
+        "created_by": user.get("user_id"),
+        "created_at": datetime.now(timezone.utc),
+    }
+    await db.invoices.insert_one(doc)
+    return {"message": "Invoice created", "invoice_id": doc["invoice_id"]}
+
+@api_router.get("/invoices")
+async def get_invoices(user: dict = Depends(get_current_user)):
+    if user.get("role") == "admin":
+        items = await db.invoices.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    else:
+        items = await db.invoices.find(
+            {"student_id": user.get("user_id")}, {"_id": 0}
+        ).sort("created_at", -1).to_list(200)
+    return items
+
+@api_router.patch("/invoices/{invoice_id}")
+async def update_invoice(invoice_id: str, user: dict = Depends(get_current_user)):
+    """Mark an invoice as paid (admin only)."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    result = await db.invoices.update_one(
+        {"invoice_id": invoice_id},
+        {"$set": {"status": "paid", "paid_at": datetime.now(timezone.utc)}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    return {"message": "Invoice marked as paid"}
+
+@api_router.delete("/invoices/{invoice_id}")
+async def delete_invoice(invoice_id: str, user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    await db.invoices.delete_one({"invoice_id": invoice_id})
+    return {"message": "Invoice deleted"}
 
 
 
@@ -418,6 +740,9 @@ app.add_middleware(
         "https://education-c7ys20tr7-uttuoo7s-projects.vercel.app",
         "https://education-app-uttuoo7s-projects.vercel.app",
         "https://education-app.vercel.app",
+        # StarZEdu Classes Vercel deployments
+        "https://starzeduclasses.vercel.app",
+        "https://education-app-frontend.onrender.com",
     ],
     allow_methods=["*"],
     allow_headers=["*"],

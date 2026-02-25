@@ -28,9 +28,11 @@ services:
     name: education-app-frontend
     env: node
     rootDir: frontend
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --legacy-peer-deps && npm run build
     staticPublishPath: build
     envVars:
       - key: REACT_APP_API_BASE
-        # Set this to: https://<your-backend-name>.onrender.com/api
+        # Set this to: https://education-app-backend.onrender.com/api
         sync: false
+      - key: NODE_OPTIONS
+        value: --openssl-legacy-provider

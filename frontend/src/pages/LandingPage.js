@@ -24,8 +24,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-8 h-8 text-orange-600" strokeWidth={2} />
-              <span className="text-2xl font-bold text-slate-900 font-outfit">ClassHub</span>
+              <img src="/logo.png" alt="StarZEdu Classes" className="h-12 w-auto" />
             </div>
             <Button
               onClick={handleLogin}
@@ -174,11 +173,10 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <GraduationCap className="w-6 h-6 text-orange-600" strokeWidth={2} />
-              <span className="text-xl font-bold font-outfit">ClassHub</span>
+              <img src="/logo.png" alt="StarZEdu Classes" className="h-10 w-auto" />
             </div>
             <p className="text-stone-400 text-sm font-manrope">
-              © 2026 ClassHub. Empowering online education.
+              © 2026 StarZEdu Classes. Empowering online education.
             </p>
           </div>
         </div>

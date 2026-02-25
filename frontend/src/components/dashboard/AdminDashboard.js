@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Users, Calendar, Video, BookOpen, Link as LinkIcon } from 'lucide-react';
+import { Users, Calendar, Video, BookOpen, Link as LinkIcon, CreditCard, FileText, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-
+import { Calendar as BigCalendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS } from 'date-fns/locale';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import API_BASE from '@/config';
+
+const locales = { 'en-US': enUS };
+const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
+const CLASS_COLORS = ['#ea580c', '#2563eb', '#16a34a', '#7c3aed', '#db2777', '#0891b2'];
 
 const AdminDashboard = ({ activeTab, user }) => {
   const [users, setUsers] = useState([]);
@@ -12,6 +21,13 @@ const AdminDashboard = ({ activeTab, user }) => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [meetLinkInputs, setMeetLinkInputs] = useState({});
+  const [studentCredits, setStudentCredits] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [calendarEvent, setCalendarEvent] = useState(null);
+  // Credit form
+  const [creditForm, setCreditForm] = useState({ student_id: '', amount: '', note: '' });
+  // Invoice form
+  const [invoiceForm, setInvoiceForm] = useState({ student_id: '', amount: '', description: '', due_date: '' });
 
   useEffect(() => {
     fetchData();
@@ -20,17 +36,18 @@ const AdminDashboard = ({ activeTab, user }) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [usersRes, classesRes, videosRes] = await Promise.all([
+      const [usersRes, classesRes, videosRes, creditsRes, invoicesRes] = await Promise.all([
         fetch(`${API_BASE}/users`, { credentials: 'include' }),
         fetch(`${API_BASE}/classes`, { credentials: 'include' }),
-        fetch(`${API_BASE}/videos`, { credentials: 'include' })
+        fetch(`${API_BASE}/videos`, { credentials: 'include' }),
+        fetch(`${API_BASE}/credits`, { credentials: 'include' }),
+        fetch(`${API_BASE}/invoices`, { credentials: 'include' }),
       ]);
-
-      if (usersRes.ok && classesRes.ok && videosRes.ok) {
-        setUsers(await usersRes.json());
-        setClasses(await classesRes.json());
-        setVideos(await videosRes.json());
-      }
+      if (usersRes.ok) setUsers(await usersRes.json());
+      if (classesRes.ok) setClasses(await classesRes.json());
+      if (videosRes.ok) setVideos(await videosRes.json());
+      if (creditsRes.ok) setStudentCredits(await creditsRes.json());
+      if (invoicesRes.ok) setInvoices(await invoicesRes.json());
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -393,6 +410,176 @@ const AdminDashboard = ({ activeTab, user }) => {
             ))}
           </div>
         )}
+      </div>
+    );
+  }
+
+  // ── CALENDAR TAB ────────────────────────────────────────────────────────
+  if (activeTab === 'calendar') {
+    const events = classes.map((cls, i) => ({
+      id: cls.class_id, title: cls.title,
+      start: new Date(cls.start_time), end: new Date(cls.end_time),
+      resource: cls, color: CLASS_COLORS[i % CLASS_COLORS.length],
+    }));
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>All Classes Calendar</h1>
+        <Card className="bg-white border border-stone-100 rounded-2xl p-4" style={{ height: 600 }}>
+          <BigCalendar localizer={localizer} events={events} startAccessor="start" endAccessor="end" style={{ height: '100%' }}
+            eventPropGetter={e => ({ style: { backgroundColor: e.color, border: 'none', borderRadius: 8, color: '#fff', fontSize: 13 } })}
+            onSelectEvent={e => setCalendarEvent(e.resource)}
+            views={['month', 'week', 'day', 'agenda']} defaultView="week" />
+        </Card>
+        {calendarEvent && (
+          <Card className="bg-white border border-orange-200 rounded-2xl p-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-bold">{calendarEvent.title}</h2>
+                <p className="text-stone-500 mt-1">Teacher: {calendarEvent.teacher_name}</p>
+                <p className="text-sm text-stone-500 mt-1">{calendarEvent.enrolled_count}/{calendarEvent.max_students} enrolled</p>
+              </div>
+              <Button variant="ghost" onClick={() => setCalendarEvent(null)} className="text-stone-500">✕</Button>
+            </div>
+          </Card>
+        )}
+      </div>
+    );
+  }
+
+  // ── BILLING TAB ─────────────────────────────────────────────────────────
+  if (activeTab === 'billing') {
+    const students = users.filter(u => u.role === 'student');
+    const unpaidInvoices = invoices.filter(i => i.status === 'unpaid');
+
+    const handleAdjustCredit = async (e) => {
+      e.preventDefault();
+      const r = await fetch(`${API_BASE}/students/${creditForm.student_id}/credits`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ amount: parseFloat(creditForm.amount), note: creditForm.note })
+      });
+      if (r.ok) { toast.success('Credits updated!'); setCreditForm({ student_id: '', amount: '', note: '' }); fetchData(); }
+      else toast.error('Failed to update credits');
+    };
+
+    const handleCreateInvoice = async (e) => {
+      e.preventDefault();
+      const r = await fetch(`${API_BASE}/invoices`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ...invoiceForm, amount: parseFloat(invoiceForm.amount) })
+      });
+      if (r.ok) { toast.success('Invoice created!'); setInvoiceForm({ student_id: '', amount: '', description: '', due_date: '' }); fetchData(); }
+      else toast.error('Failed to create invoice');
+    };
+
+    const handleMarkPaid = async (invoiceId) => {
+      const r = await fetch(`${API_BASE}/invoices/${invoiceId}`, { method: 'PATCH', credentials: 'include' });
+      if (r.ok) { toast.success('Marked as paid!'); fetchData(); }
+      else toast.error('Failed');
+    };
+
+    const handleDeleteInvoice = async (invoiceId) => {
+      await fetch(`${API_BASE}/invoices/${invoiceId}`, { method: 'DELETE', credentials: 'include' });
+      fetchData(); toast.success('Deleted');
+    };
+
+    return (
+      <div className="space-y-8">
+        <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>Billing</h1>
+
+        {/* Summary cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-white border border-stone-100 rounded-2xl p-6">
+            <p className="text-sm text-stone-500 uppercase tracking-wide mb-1">Total Students</p>
+            <p className="text-3xl font-bold">{students.length}</p>
+          </Card>
+          <Card className="bg-white border border-stone-100 rounded-2xl p-6">
+            <p className="text-sm text-stone-500 uppercase tracking-wide mb-1">Unpaid Invoices</p>
+            <p className="text-3xl font-bold text-red-600">{unpaidInvoices.length}</p>
+          </Card>
+          <Card className="bg-white border border-stone-100 rounded-2xl p-6">
+            <p className="text-sm text-stone-500 uppercase tracking-wide mb-1">Unpaid Amount</p>
+            <p className="text-3xl font-bold text-red-600">₹{unpaidInvoices.reduce((s, i) => s + i.amount, 0).toFixed(2)}</p>
+          </Card>
+        </div>
+
+        {/* Credits Management */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Card className="bg-white border border-stone-100 rounded-2xl p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              <CreditCard className="w-5 h-5 text-orange-500" /> Adjust Credits
+            </h2>
+            <form onSubmit={handleAdjustCredit} className="space-y-3">
+              <div><Label>Student</Label>
+                <select className="w-full px-4 py-2 border border-stone-200 rounded-lg text-sm" value={creditForm.student_id} onChange={e => setCreditForm({ ...creditForm, student_id: e.target.value })} required>
+                  <option value="">Select student</option>
+                  {students.map(s => <option key={s.user_id} value={s.user_id}>{s.name} ({s.email})</option>)}
+                </select>
+              </div>
+              <div><Label>Amount (use negative to deduct)</Label><Input type="number" step="0.01" placeholder="e.g. 500 or -100" value={creditForm.amount} onChange={e => setCreditForm({ ...creditForm, amount: e.target.value })} required /></div>
+              <div><Label>Note</Label><Input placeholder="e.g. Monthly fee paid" value={creditForm.note} onChange={e => setCreditForm({ ...creditForm, note: e.target.value })} /></div>
+              <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-full">Apply</Button>
+            </form>
+          </Card>
+
+          {/* Balances table */}
+          <Card className="bg-white border border-stone-100 rounded-2xl p-6">
+            <h2 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>Student Balances</h2>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {studentCredits.map(s => (
+                <div key={s.user_id} className="flex justify-between items-center py-2 border-b border-stone-100 last:border-0">
+                  <div><p className="text-sm font-medium text-slate-900">{s.name}</p><p className="text-xs text-stone-400">{s.email}</p></div>
+                  <span className={`font-bold text-sm ${s.credit_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>₹{(s.credit_balance || 0).toFixed(2)}</span>
+                </div>
+              ))}
+              {studentCredits.length === 0 && <p className="text-stone-500 text-sm">No students yet</p>}
+            </div>
+          </Card>
+        </div>
+
+        {/* Create Invoice */}
+        <Card className="bg-white border border-stone-100 rounded-2xl p-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <FileText className="w-5 h-5 text-orange-500" /> Create Invoice
+          </h2>
+          <form onSubmit={handleCreateInvoice} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><Label>Student</Label>
+              <select className="w-full px-4 py-2 border border-stone-200 rounded-lg text-sm" value={invoiceForm.student_id} onChange={e => setInvoiceForm({ ...invoiceForm, student_id: e.target.value })} required>
+                <option value="">Select student</option>
+                {students.map(s => <option key={s.user_id} value={s.user_id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div><Label>Amount (₹)</Label><Input type="number" step="0.01" min="0" placeholder="e.g. 1500" value={invoiceForm.amount} onChange={e => setInvoiceForm({ ...invoiceForm, amount: e.target.value })} required /></div>
+            <div><Label>Description</Label><Input placeholder="e.g. March tuition" value={invoiceForm.description} onChange={e => setInvoiceForm({ ...invoiceForm, description: e.target.value })} required /></div>
+            <div><Label>Due Date</Label><Input type="date" value={invoiceForm.due_date} onChange={e => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })} required /></div>
+            <div className="md:col-span-2"><Button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white rounded-full">Create Invoice</Button></div>
+          </form>
+        </Card>
+
+        {/* All Invoices */}
+        <div>
+          <h2 className="text-xl font-semibold mb-3">All Invoices</h2>
+          {invoices.length === 0 ? <Card className="p-6 text-center"><p className="text-stone-500">No invoices yet</p></Card> : (
+            <div className="space-y-3">
+              {invoices.map(inv => (
+                <Card key={inv.invoice_id} className="bg-white border border-stone-100 rounded-xl p-4 flex flex-wrap justify-between items-center gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-900">{inv.student_name}</p>
+                    <p className="text-sm text-stone-500">{inv.description} · Due: {new Date(inv.due_date).toLocaleDateString()}</p>
+                    <p className="text-xs text-stone-400">{inv.student_email}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <p className="font-bold text-lg">₹{inv.amount.toFixed(2)}</p>
+                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${inv.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{inv.status}</span>
+                    {inv.status === 'unpaid' && <Button onClick={() => handleMarkPaid(inv.invoice_id)} size="sm" className="bg-green-600 hover:bg-green-700 text-white rounded-full text-xs">Mark Paid</Button>}
+                    <Button onClick={() => handleDeleteInvoice(inv.invoice_id)} variant="ghost" className="text-red-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }

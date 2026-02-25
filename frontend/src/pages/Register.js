@@ -55,8 +55,9 @@ const Register = () => {
         <div className="min-h-screen flex items-center justify-center bg-[#FDFCF8]">
             <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
                 <div className="text-center mb-6">
+                    <img src="/logo.png" alt="StarZEdu Classes" className="h-16 w-auto mx-auto mb-3" />
                     <h2 className="text-2xl font-bold text-slate-900 font-outfit">Create an account</h2>
-                    <p className="text-stone-500 text-sm mt-1 font-manrope">Join ClassHub today — it's free</p>
+                    <p className="text-stone-500 text-sm mt-1 font-manrope">Join StarZEdu Classes today — it's free</p>
                 </div>
 
                 {error && (
