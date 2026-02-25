@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const Register = () => {
     const navigate = useNavigate();
-    const { checkAuth } = useAuth();
+    const { setUser } = useAuth();
     const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -37,11 +37,12 @@ const Register = () => {
             const formData = new URLSearchParams();
             formData.append("username", form.email);
             formData.append("password", form.password);
-            await axios.post(`${API_BASE}/auth/login`, formData, {
+            const loginRes = await axios.post(`${API_BASE}/auth/login`, formData, {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 withCredentials: true,
             });
-            await checkAuth();   // sync AuthContext user state with the new cookie
+            // login response includes user — set in context before navigating
+            if (loginRes.data?.user) setUser(loginRes.data.user);
             navigate("/dashboard");
         } catch (err) {
             setError(err.response?.data?.detail || "Registration failed. Try again.");

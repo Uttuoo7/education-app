@@ -19,12 +19,15 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
+        return userData; // return user so callers can act on it
       } else {
         setUser(null);
+        return null;
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       setUser(null);
+      return null;
     } finally {
       setLoading(false);
     }

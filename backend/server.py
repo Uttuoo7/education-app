@@ -171,9 +171,10 @@ async def login_user(
     )
 
     return {
-    "access_token": access_token,
-    "token_type": "bearer"
-}
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {k: v for k, v in user.items() if k not in ["password", "_id"]}
+    }
 
 
 @api_router.get("/auth/me", response_model=User)

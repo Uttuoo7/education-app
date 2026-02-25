@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { checkAuth } = useAuth();
+  const { setUser } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,17 +19,16 @@ const Login = () => {
       const formData = new URLSearchParams();
       formData.append("username", email);
       formData.append("password", password);
-      await axios.post(
+      const res = await axios.post(
         `${API_BASE}/auth/login`,
         formData,
         {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          withCredentials: true,   // 🔥 VERY IMPORTANT
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          withCredentials: true,
         }
       );
-      await checkAuth();   // sync AuthContext user state with the new cookie
+      // login response now includes user data — set it in context before navigating
+      if (res.data?.user) setUser(res.data.user);
       navigate("/dashboard");
     } catch (err) {
       alert("Invalid credentials");
