@@ -31,6 +31,6 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: build
     envVars:
-      - key: REACT_APP_API_URL
-        # Set this to: https://<your-backend-name>.onrender.com
+      - key: REACT_APP_API_BASE
+        # Set this to: https://<your-backend-name>.onrender.com/api
         sync: false

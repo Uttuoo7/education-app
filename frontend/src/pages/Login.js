@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API_BASE from "@/config";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,16 +18,16 @@ const Login = () => {
       formData.append("username", email);
       formData.append("password", password);
       await axios.post(
-       `${API_BASE}/auth/login`,
-       formData,
-       {
+        `${API_BASE}/auth/login`,
+        formData,
+        {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-         },
+          },
           withCredentials: true,   // 🔥 VERY IMPORTANT
         }
       );
-      
+
 
       navigate("/dashboard");
     } catch (err) {
@@ -68,6 +69,13 @@ const Login = () => {
         >
           Login
         </button>
+
+        <p className="text-center text-sm text-stone-500 mt-4">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-orange-600 hover:text-orange-700 font-medium">
+            Sign up
+          </Link>
+        </p>
       </form>
     </div>
   );

@@ -7,8 +7,9 @@ import { AuthProvider } from "@/context/AuthContext";
 
 // Code-split each page into its own chunk — only loaded when navigated to
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
-const Dashboard   = lazy(() => import("@/pages/Dashboard"));
-const Login       = lazy(() => import("@/pages/Login"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Login = lazy(() => import("@/pages/Login"));
+const Register = lazy(() => import("@/pages/Register"));
 const SchedulePage = lazy(() => import("./pages/SchedulePage"));
 
 // Lightweight fallback shown while a page chunk is loading
@@ -33,11 +34,12 @@ function App() {
         <BrowserRouter>
           <Suspense fallback={<PageSpinner />}>
             <Routes>
-              <Route path="/"         element={<LandingPage />} />
-              <Route path="/login"    element={<Login />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/schedule" element={<SchedulePage />} />
-              <Route path="*"         element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
           <Toaster position="bottom-right" />
