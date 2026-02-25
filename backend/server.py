@@ -743,6 +743,7 @@ app.add_middleware(
         # StarZEdu Classes Vercel deployments
         "https://starzeduclasses.vercel.app",
         "https://education-app-frontend.onrender.com",
+        "https://education-k8w7qgrhc-uttuoo7s-projects.vercel.app",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
