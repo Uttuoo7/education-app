@@ -4,12 +4,12 @@ import API_BASE from "./config";
 import { Toaster } from "@/components/ui/sonner";
 import "@/App.css";
 import { AuthProvider } from "@/context/AuthContext";
+import Register from "@/pages/Register";
 
 // Code-split each page into its own chunk — only loaded when navigated to
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Login = lazy(() => import("@/pages/Login"));
-const Register = lazy(() => import("@/pages/Register"));
 const SchedulePage = lazy(() => import("./pages/SchedulePage"));
 
 // Lightweight fallback shown while a page chunk is loading
