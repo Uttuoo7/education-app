@@ -53,7 +53,7 @@ class ClassCreate(BaseModel):
     start_time: str
     end_time: str
     max_students: int = 50
-    recording_link: None
+    recording_link: Optional[str] = None
 
 class ClassResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -92,6 +92,7 @@ class VideoResponse(BaseModel):
 class UserUpdate(BaseModel):
     role: Optional[str] = None
     name: Optional[str] = None
+    meet_link: Optional[str] = None
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -219,8 +220,6 @@ async def create_class(class_data: ClassCreate, user: dict = Depends(get_current
 
 @api_router.get("/classes", response_model=List[ClassResponse])
 async def get_classes(user: dict = Depends(get_current_user)):
-   
-    
     if user.get("role") == "teacher":
         classes = await db.classes.find({"teacher_id": user.get("user_id")}, {"_id": 0}).to_list(1000)
     elif user.get("role") == "student":
@@ -229,16 +228,27 @@ async def get_classes(user: dict = Depends(get_current_user)):
         classes = await db.classes.find({"class_id": {"$in": class_ids}}, {"_id": 0}).to_list(1000)
     else:
         classes = await db.classes.find({}, {"_id": 0}).to_list(1000)
-    
+
+    # Enrich each class with the teacher's *current* meet_link
+    teacher_cache = {}
+    for cls in classes:
+        tid = cls.get("teacher_id")
+        if tid not in teacher_cache:
+            teacher_cache[tid] = await db.users.find_one({"user_id": tid}, {"_id": 0})
+        teacher = teacher_cache.get(tid) or {}
+        cls["meet_link"] = teacher.get("meet_link")
     return [ClassResponse(**c) for c in classes]
 
 @api_router.get("/classes/{class_id}", response_model=ClassResponse)
 async def get_class(class_id: str, user: dict = Depends(get_current_user)):
-   
     class_doc = await db.classes.find_one({"class_id": class_id}, {"_id": 0})
     if not class_doc:
         raise HTTPException(status_code=404, detail="Class not found")
-    
+
+    # Always show teacher's current meet_link
+    teacher = await db.users.find_one({"user_id": class_doc.get("teacher_id")}, {"_id": 0}) or {}
+    class_doc["meet_link"] = teacher.get("meet_link")
+
     return ClassResponse(**class_doc)
 
 @api_router.post("/classes/{class_id}/meet")

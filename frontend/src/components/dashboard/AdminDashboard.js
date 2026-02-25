@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Calendar, Video, BookOpen } from 'lucide-react';
+import { Users, Calendar, Video, BookOpen, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ const AdminDashboard = ({ activeTab, user }) => {
   const [classes, setClasses] = useState([]);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [meetLinkInputs, setMeetLinkInputs] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -54,6 +55,26 @@ const AdminDashboard = ({ activeTab, user }) => {
       }
     } catch (error) {
       toast.error('Failed to update role');
+    }
+  };
+
+  const handleMeetLinkUpdate = async (userId, meetLink) => {
+    try {
+      const response = await fetch(`${API_BASE}/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ meet_link: meetLink })
+      });
+
+      if (response.ok) {
+        toast.success('Meet link updated!');
+        fetchData();
+      } else {
+        toast.error('Failed to update meet link');
+      }
+    } catch (error) {
+      toast.error('Failed to update meet link');
     }
   };
 
@@ -203,6 +224,7 @@ const AdminDashboard = ({ activeTab, user }) => {
                   <th className="px-6 py-4 text-left text-xs font-medium text-stone-500 uppercase tracking-wide" style={{ fontFamily: 'Manrope, sans-serif' }}>User</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-stone-500 uppercase tracking-wide" style={{ fontFamily: 'Manrope, sans-serif' }}>Email</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-stone-500 uppercase tracking-wide" style={{ fontFamily: 'Manrope, sans-serif' }}>Role</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-stone-500 uppercase tracking-wide" style={{ fontFamily: 'Manrope, sans-serif' }}>Meet Link (Teachers)</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-stone-500 uppercase tracking-wide" style={{ fontFamily: 'Manrope, sans-serif' }}>Actions</th>
                 </tr>
               </thead>
@@ -218,11 +240,34 @@ const AdminDashboard = ({ activeTab, user }) => {
                     <td className="px-6 py-4 text-sm text-stone-600" style={{ fontFamily: 'Manrope, sans-serif' }}>{u.email}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 text-xs font-medium rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                          u.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
-                            'bg-green-100 text-green-700'
+                        u.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
+                          'bg-green-100 text-green-700'
                         }`}>
                         {u.role}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {u.role === 'teacher' ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="url"
+                            placeholder="https://meet.google.com/..."
+                            defaultValue={u.meet_link || ''}
+                            onChange={(e) => setMeetLinkInputs(prev => ({ ...prev, [u.user_id]: e.target.value }))}
+                            className="flex-1 px-3 py-1 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 min-w-[200px]"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => handleMeetLinkUpdate(u.user_id, meetLinkInputs[u.user_id] ?? u.meet_link ?? '')}
+                            className="bg-orange-600 hover:bg-orange-700 text-white text-xs px-3 py-1 rounded-full"
+                          >
+                            <LinkIcon className="w-3 h-3 mr-1" />
+                            Set
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-stone-400">—</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {u.user_id !== user.user_id && (
