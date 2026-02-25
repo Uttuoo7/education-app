@@ -6,9 +6,10 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // non-blocking: render immediately, update silently
 
   const checkAuth = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE}/auth/me`, {
         credentials: 'include'
