@@ -389,7 +389,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_origins=[
         "http://localhost:3000",
-        "https://education-app-r35s.onrender.com", "http://127.0.0.1:3000",
+        "http://127.0.0.1:3000",
+        "https://education-app-r35s.onrender.com",
+        # Vercel deployments
+        "https://education-c7ys20tr7-uttuoo7s-projects.vercel.app",
+        "https://education-app-uttuoo7s-projects.vercel.app",
+        "https://education-app.vercel.app",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
