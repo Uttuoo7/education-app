@@ -2,10 +2,12 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import API_BASE from "@/config";
+import { useAuth } from "@/context/AuthContext";
 
 
 const Login = () => {
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,8 +29,7 @@ const Login = () => {
           withCredentials: true,   // 🔥 VERY IMPORTANT
         }
       );
-
-
+      await checkAuth();   // sync AuthContext user state with the new cookie
       navigate("/dashboard");
     } catch (err) {
       alert("Invalid credentials");

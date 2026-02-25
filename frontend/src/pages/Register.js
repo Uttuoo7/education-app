@@ -2,9 +2,11 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import API_BASE from "@/config";
+import { useAuth } from "@/context/AuthContext";
 
 const Register = () => {
     const navigate = useNavigate();
+    const { checkAuth } = useAuth();
     const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -39,6 +41,7 @@ const Register = () => {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 withCredentials: true,
             });
+            await checkAuth();   // sync AuthContext user state with the new cookie
             navigate("/dashboard");
         } catch (err) {
             setError(err.response?.data?.detail || "Registration failed. Try again.");
